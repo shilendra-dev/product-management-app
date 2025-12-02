@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: prodman-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: prodman_db
+      POSTGRES_USER: prodman_user
+      POSTGRES_PASSWORD: prodman_password
+    ports:
+      - '5438:5432' # Changed to avoid conflicts with other projects
+    volumes:
+      - prodman_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U prodman_user -d prodman_db']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  prodman_postgres_data:
+    driver: local

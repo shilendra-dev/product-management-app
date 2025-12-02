@@ -12,7 +12,10 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ]
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ],
     },
 
     /* Bundler mode */
