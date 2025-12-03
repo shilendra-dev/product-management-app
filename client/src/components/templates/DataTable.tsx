@@ -12,21 +12,25 @@ import {
   TableHeader,
   TableRow,
 } from "@components/molecules/Table";
+import type { Product } from "@/types/product";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  setSelectedProduct: React.Dispatch<React.SetStateAction<Product | null>>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  setSelectedProduct,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
   return (
     <div className="border rounded-2xl bg-background overflow-hidden">
       <Table>
@@ -54,7 +58,7 @@ export function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                onClick={() => console.log(row.id)}
+                onClick={() => setSelectedProduct(row.original as Product)}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="p-3 px-6">

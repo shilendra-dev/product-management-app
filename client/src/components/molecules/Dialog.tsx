@@ -5,6 +5,10 @@ import {
   DialogClose as UiDialogClose,
   DialogOverlay as UiDialogOverlay,
   DialogContent as UiDialogContent,
+  DialogHeader as UiDialogHeader,
+  DialogFooter as UiDialogFooter,
+  DialogTitle as UiDialogTitle,
+  DialogDescription as UiDialogDescription,
 } from "@components/ui/dialog";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 
@@ -42,6 +46,22 @@ function DialogContent(
   return <UiDialogContent {...props} />;
 }
 
+function DialogHeader(props: React.ComponentProps<"div">) {
+  return <UiDialogHeader {...props} />;
+}
+
+function DialogFooter(props: React.ComponentProps<"div">) {
+  return <UiDialogFooter {...props} />;
+}
+
+function DialogTitle(props: React.ComponentProps<typeof DialogPrimitive.Title>) {
+  return <UiDialogTitle {...props} />;
+}
+
+function DialogDescription(props: React.ComponentProps<typeof DialogPrimitive.Description>) {
+  return <UiDialogDescription {...props} />;
+}
+
 export {
   Dialog,
   DialogTrigger,
@@ -49,4 +69,8 @@ export {
   DialogClose,
   DialogOverlay,
   DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
 };

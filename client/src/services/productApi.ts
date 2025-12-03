@@ -22,3 +22,13 @@ export const getProducts = async (): Promise<Product[]> => {
         throw error;
     }
 }
+
+export const updateProduct = async (productData: Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">, productId: string): Promise<Product> => {
+  try {
+    const response = await api.put<Product>(`/products/${productId}`, productData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating product:", error);
+    throw error;
+  }
+}

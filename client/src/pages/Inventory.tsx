@@ -4,9 +4,13 @@ import { DataTable } from "@/components/templates/DataTable";
 import { columns } from "@/components/organisms/Columns";
 import { getProducts } from "@/services/productApi";
 import type { Product } from "@/types/product";
+import { UpdateProductDialog } from "@/components/organisms/UpdateProductDialog";
+import Modal from "@/components/templates/modal";
 
 const Inventory = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -19,7 +23,15 @@ const Inventory = () => {
 
   const onCreateProduct = (newProduct: Product) => {
     setProducts([...products, newProduct]);
-  }
+  };
+
+  const onUpdateProduct = (updatedProduct: Product) => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === updatedProduct.id ? updatedProduct : product
+      )
+    );
+  };
 
   return (
     <div className="bg-secondary-background w-full h-screen flex flex-col">
@@ -37,11 +49,29 @@ const Inventory = () => {
               {products.length} products in inventory
             </p>
             <div className="mt-4">
-              <DataTable columns={columns} data={products} />
+              <DataTable
+                columns={columns}
+                data={products}
+                setSelectedProduct={(product) => {
+                  setSelectedProduct(product);
+                  setIsUpdateDialogOpen(true);
+                }}
+              />
             </div>
           </div>
         </div>
       </div>
+      {selectedProduct && isUpdateDialogOpen && (
+        <Modal
+          isOpen={isUpdateDialogOpen}
+          onClose={() => {
+            setIsUpdateDialogOpen(false);
+            setSelectedProduct(null);
+          }}
+        >
+          <UpdateProductDialog product={selectedProduct} isUpdateDialogOpen={isUpdateDialogOpen} setIsUpdateDialogOpen={setIsUpdateDialogOpen} onUpdateProduct={onUpdateProduct} />
+        </Modal>
+      )}.
     </div>
   );
 };
