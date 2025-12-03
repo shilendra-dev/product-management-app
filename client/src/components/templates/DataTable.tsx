@@ -28,14 +28,14 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
   });
   return (
-    <div>
-      <Table className="border bg-background">
+    <div className="border rounded-2xl bg-background overflow-hidden">
+      <Table>
         <TableHeader className="bg-secondary-background">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id} className="font-bold">
+                  <TableHead key={header.id} className="font-bold p-4 px-6">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -54,9 +54,10 @@ export function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                onClick={() => console.log(row.id)}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell key={cell.id} className="p-3 px-6">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}

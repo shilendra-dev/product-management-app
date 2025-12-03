@@ -31,7 +31,7 @@ const Inventory = () => {
       {/* BODY */}
       <div className="p-4 w-full flex items-center justify-center bg-secondary-background">
         <div className="flex flex-col gap-4 w-5xl bg-background">
-          <div className="flex flex-col bg-secondary-background p-4 border rounded-lg">
+          <div className="flex flex-col bg-background p-4 border rounded-xl">
             <h1 className="text-xl">Products</h1>
             <p className="text-muted-foreground text-sm">
               {products.length} products in inventory
