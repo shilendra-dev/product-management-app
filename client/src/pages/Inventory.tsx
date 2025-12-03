@@ -1,21 +1,31 @@
 import Header from "@components/organisms/Header";
-import { useEffect } from "react";
-import useProduct from "@/store/productStore";
+import { useEffect, useState } from "react";
 import { DataTable } from "@/components/templates/DataTable";
-import { columns } from "@/components/organisms/columns";
+import { columns } from "@/components/organisms/Columns";
+import { getProducts } from "@/services/productApi";
+import type { Product } from "@/types/product";
 
 const Inventory = () => {
-  const { products, getProducts } = useProduct();
+  const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    getProducts();
-  }, []); // eslint-disable-line
+    const fetchProducts = async () => {
+      const productList = await getProducts();
+      setProducts(productList);
+    };
+
+    fetchProducts();
+  }, []);
+
+  const onCreateProduct = (newProduct: Product) => {
+    setProducts([...products, newProduct]);
+  }
 
   return (
     <div className="bg-secondary-background w-full h-screen flex flex-col">
       <div className="bg-secondary-background p-4 w-full flex items-center justify-center border-b">
         {/* HEADER */}
-        <Header />
+        <Header onCreateProduct={onCreateProduct} />
       </div>
 
       {/* BODY */}

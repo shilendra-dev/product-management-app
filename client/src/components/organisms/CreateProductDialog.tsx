@@ -13,28 +13,36 @@ import { Input } from "@/components/atoms/Input";
 import { Label } from "@/components/atoms/Label";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { createProduct } from "@/services/productApi";
+import type { Product } from "@/types/product";
 
-export function CreateProductDialog() {
-    const [formData, setFormData] = useState({
-        title: "",
-        description: "",
-        price: 0,
-        quantity: 0,
-        totalDiscount: 0
+export function CreateProductDialog(props: {
+  onCreateProduct: (newProduct: Product) => void;
+}) {
+  const [formData, setFormData] = useState<
+    Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">
+  >({
+    title: "",
+    description: "",
+    totalPrice: 0,
+    quantity: 0,
+    totalDiscount: 0,
+  });
+
+  const submitHandler = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const newProduct = await createProduct(formData);
+    props.onCreateProduct(newProduct);
+  };
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]:
+        e.target.type === "number" ? Number(e.target.value) : e.target.value,
     });
-
-    const submitHandler = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log("Form Data Submitted: ", formData);
-    }
-
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.type === "number" ? Number(e.target.value) : e.target.value
-        });
-        console.log(formData);
-    }
+    console.log(formData);
+  };
   return (
     <Dialog>
       <form>
@@ -54,32 +62,62 @@ export function CreateProductDialog() {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <Label>Title</Label>
-              <Input placeholder="Product title" onChange={onChange} name="title" value={formData.title} />
+              <Input
+                placeholder="Product title"
+                onChange={onChange}
+                name="title"
+                value={formData.title}
+              />
             </div>
             <div className="flex flex-col gap-3">
               <Label>Description</Label>
-              <Input placeholder="Product description..." onChange={onChange} name="description" value={formData.description} />
+              <Input
+                placeholder="Product description..."
+                onChange={onChange}
+                name="description"
+                value={formData.description}
+              />
             </div>
             <div className="flex justify-between">
               <div className="flex flex-col gap-3">
                 <Label>Price</Label>
-                <Input type="number" placeholder="0.00" onChange={onChange} name="price" value={formData.price} />
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  onChange={onChange}
+                  name="totalPrice"
+                  value={formData.totalPrice}
+                />
               </div>
               <div className="flex flex-col gap-3">
                 <Label>Quantity</Label>
-                <Input type="number" placeholder="0" onChange={onChange} name="quantity" value={formData.quantity} />
+                <Input
+                  type="number"
+                  placeholder="0"
+                  onChange={onChange}
+                  name="quantity"
+                  value={formData.quantity}
+                />
               </div>
             </div>
             <div className="flex flex-col gap-3">
               <Label>Total Discount</Label>
-              <Input type="number" placeholder="0" onChange={onChange} name="totalDiscount" value={formData.totalDiscount} />
+              <Input
+                type="number"
+                placeholder="0"
+                onChange={onChange}
+                name="totalDiscount"
+                value={formData.totalDiscount}
+              />
             </div>
           </div>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit" onClick={submitHandler}>Add Product</Button>
+            <Button type="submit" onClick={submitHandler}>
+              Add Product
+            </Button>
           </DialogFooter>
         </DialogContent>
       </form>

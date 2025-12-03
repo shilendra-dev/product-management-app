@@ -1,7 +1,8 @@
 import { Box } from 'lucide-react'
 import { CreateProductDialog } from './CreateProductDialog'
+import type { Product } from '@/types/product'
 
-function Header() {
+function Header(props: {onCreateProduct: (newProduct: Product) => void}) {
   return (
     <div className="flex items-center justify-between w-5xl">
           {/* logo */}
@@ -21,7 +22,7 @@ function Header() {
 
           {/* Add product button */}
           <div>
-            <CreateProductDialog />
+            <CreateProductDialog onCreateProduct={props.onCreateProduct} />
           </div>
         </div>
   )
