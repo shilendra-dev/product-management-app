@@ -12,13 +12,15 @@ import {
 import { Input } from "@/components/atoms/Input";
 import { Label } from "@/components/atoms/Label";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createProduct } from "@/services/productApi";
 import type { Product } from "@/types/product";
 
 export function CreateProductDialog(props: {
   onCreateProduct: (newProduct: Product) => void;
 }) {
+  const dialogCloseRef = useRef<HTMLButtonElement>(null);
+
   const [formData, setFormData] = useState<
     Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">
   >({
@@ -28,11 +30,40 @@ export function CreateProductDialog(props: {
     quantity: 0,
     totalDiscount: 0,
   });
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const submitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newProduct = await createProduct(formData);
-    props.onCreateProduct(newProduct);
+    try{
+      setLoading(true);
+      setError(null);
+      if(!formData.title || !formData.totalPrice || !formData.quantity){
+        setError("Title, Price, and Quantity are required fields.");
+        setLoading(false);
+        return;
+      }
+      if(formData.totalPrice < 0 || formData.quantity < 0 || formData.totalDiscount < 0){
+        setError("Price, Quantity, and Discount cannot be negative.");
+        setLoading(false);
+        return;
+      }
+      if(formData.totalDiscount > formData.totalPrice){
+        setError("Total Discount cannot exceed Total Price.");
+        setLoading(false);
+        return;
+      }
+      const newProduct = await createProduct(formData);
+      props.onCreateProduct(newProduct);
+      if (dialogCloseRef.current) {
+        dialogCloseRef.current.click();
+      }
+      setLoading(false);
+    }catch(error){
+      console.error("Error creating product:", error);
+      setError("Failed to create product. Please try again.");
+      setLoading(false);
+    }
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,13 +141,14 @@ export function CreateProductDialog(props: {
                 value={formData.totalDiscount}
               />
             </div>
+          {error && <p className="text-destructive text-sm">{error}</p>}
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button ref={dialogCloseRef} variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit" onClick={submitHandler}>
-              Add Product
+            <Button type="submit" onClick={submitHandler} disabled={loading}>
+              {loading ? "Adding..." : "Add Product"}
             </Button>
           </DialogFooter>
         </DialogContent>
