@@ -14,21 +14,36 @@ export const createProduct = async (
 };
 
 export const getProducts = async (): Promise<Product[]> => {
-    try {
-        const response = await api.get<Product[]>("/products");
-        return response.data;
-    }catch (error) {
-        console.error("Error fetching products:", error);
-        throw error;
-    }
-}
-
-export const updateProduct = async (productData: Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">, productId: string): Promise<Product> => {
   try {
-    const response = await api.put<Product>(`/products/${productId}`, productData);
+    const response = await api.get<Product[]>("/products");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw error;
+  }
+};
+
+export const updateProduct = async (
+  productData: Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">,
+  productId: string
+): Promise<Product> => {
+  try {
+    const response = await api.put<Product>(
+      `/products/${productId}`,
+      productData
+    );
     return response.data;
   } catch (error) {
     console.error("Error updating product:", error);
     throw error;
   }
-}
+};
+
+export const deleteProduct = async (productId: string): Promise<void> => {
+  try {
+    await api.delete(`/products/${productId}`);
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    throw error;
+  }
+};

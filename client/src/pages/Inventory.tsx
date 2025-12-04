@@ -71,7 +71,7 @@ const Inventory = () => {
         >
           <UpdateProductDialog product={selectedProduct} isUpdateDialogOpen={isUpdateDialogOpen} setIsUpdateDialogOpen={setIsUpdateDialogOpen} onUpdateProduct={onUpdateProduct} />
         </Modal>
-      )}.
+      )}
     </div>
   );
 };

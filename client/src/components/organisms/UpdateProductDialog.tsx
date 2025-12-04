@@ -11,7 +11,7 @@ import { Label } from "../atoms/Label";
 import { Input } from "../atoms/Input";
 import Button from "../atoms/Button";
 import { useState } from "react";
-import { updateProduct } from "@/services/productApi";
+import { deleteProduct, updateProduct } from "@/services/productApi";
 
 export function UpdateProductDialog({
   product,
@@ -85,6 +85,20 @@ export function UpdateProductDialog({
       setLoading(false);
     }
   };
+
+  const handleDelete = async () => {
+    try{
+        setLoading(true);
+        setError(null);
+        if(!product) throw new Error("Product not found");
+        await deleteProduct(product.id);
+        setLoading(false);
+        setIsUpdateDialogOpen(false);
+    }catch(error){
+        setError("Failed to delete product. Please try again. Error: " + error);
+        setLoading(false);
+    }
+  }
 
   return (
     <Dialog open={isUpdateDialogOpen} onOpenChange={setIsUpdateDialogOpen}>
@@ -164,7 +178,7 @@ export function UpdateProductDialog({
             {error && <p className="text-destructive text-sm">{error}</p>}
           </div>
           <DialogFooter>
-            <Button variant="destructive">Delete</Button>
+            <Button variant="destructive" onClick={handleDelete}>Delete</Button>
             <Button type="submit" disabled={loading} onClick={submitHandler}>
               {loading ? "Updating..." : "Update Product"}
             </Button>
