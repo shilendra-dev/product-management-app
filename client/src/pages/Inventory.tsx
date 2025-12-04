@@ -33,6 +33,12 @@ const Inventory = () => {
     );
   };
 
+  const onDeleteProduct = (deletedProductId: string) => {
+    setProducts((prevProducts) =>
+      prevProducts.filter((product) => product.id !== deletedProductId)
+    );
+  }
+
   return (
     <div className="bg-secondary-background w-full h-screen flex flex-col">
       <div className="bg-secondary-background p-4 w-full flex items-center justify-center border-b">
@@ -69,7 +75,13 @@ const Inventory = () => {
             setSelectedProduct(null);
           }}
         >
-          <UpdateProductDialog product={selectedProduct} isUpdateDialogOpen={isUpdateDialogOpen} setIsUpdateDialogOpen={setIsUpdateDialogOpen} onUpdateProduct={onUpdateProduct} />
+          <UpdateProductDialog
+            product={selectedProduct}
+            isUpdateDialogOpen={isUpdateDialogOpen}
+            setIsUpdateDialogOpen={setIsUpdateDialogOpen}
+            onUpdateProduct={onUpdateProduct}
+            onDeleteProduct={onDeleteProduct}
+          />
         </Modal>
       )}
     </div>

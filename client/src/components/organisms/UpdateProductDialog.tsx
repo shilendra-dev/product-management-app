@@ -18,11 +18,13 @@ export function UpdateProductDialog({
   isUpdateDialogOpen,
   setIsUpdateDialogOpen,
   onUpdateProduct,
+  onDeleteProduct,
 }: {
   product: Product | null;
   isUpdateDialogOpen: boolean;
   setIsUpdateDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onUpdateProduct: (updatedProduct: Product) => void;
+  onDeleteProduct: (deletedProductId: string) => void;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +76,7 @@ export function UpdateProductDialog({
     }
 
     try {
-        if(!product) throw new Error("Product not found");
+      if (!product) throw new Error("Product not found");
       const updatedProduct = await updateProduct(formData, product.id);
       console.log("Updated Product:", updatedProduct);
       onUpdateProduct(updatedProduct);
@@ -87,18 +89,19 @@ export function UpdateProductDialog({
   };
 
   const handleDelete = async () => {
-    try{
-        setLoading(true);
-        setError(null);
-        if(!product) throw new Error("Product not found");
-        await deleteProduct(product.id);
-        setLoading(false);
-        setIsUpdateDialogOpen(false);
-    }catch(error){
-        setError("Failed to delete product. Please try again. Error: " + error);
-        setLoading(false);
+    try {
+      setLoading(true);
+      setError(null);
+      if (!product) throw new Error("Product not found");
+      const deletedProduct = await deleteProduct(product.id);
+      onDeleteProduct(deletedProduct.id);
+      setLoading(false);
+      setIsUpdateDialogOpen(false);
+    } catch (error) {
+      setError("Failed to delete product. Please try again. Error: " + error);
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={isUpdateDialogOpen} onOpenChange={setIsUpdateDialogOpen}>
@@ -178,7 +181,13 @@ export function UpdateProductDialog({
             {error && <p className="text-destructive text-sm">{error}</p>}
           </div>
           <DialogFooter>
-            <Button variant="destructive" onClick={handleDelete} disabled={loading}>Delete</Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={loading}
+            >
+              Delete
+            </Button>
             <Button type="submit" disabled={loading} onClick={submitHandler}>
               Update
             </Button>
