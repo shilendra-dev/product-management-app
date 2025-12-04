@@ -178,9 +178,9 @@ export function UpdateProductDialog({
             {error && <p className="text-destructive text-sm">{error}</p>}
           </div>
           <DialogFooter>
-            <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={loading}>Delete</Button>
             <Button type="submit" disabled={loading} onClick={submitHandler}>
-              {loading ? "Updating..." : "Update Product"}
+              Update
             </Button>
           </DialogFooter>
         </DialogContent>
