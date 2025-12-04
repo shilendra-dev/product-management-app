@@ -15,7 +15,10 @@ export class ProductsQueryService {
   }
 
   async getAllProductsQuery() {
-    const products = await this.prisma.product.findMany();
+    //exclude deleted products
+    const products = await this.prisma.product.findMany({
+      where: { deletedAt: null },
+    });
     return products;
   }
 
