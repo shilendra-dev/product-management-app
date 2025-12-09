@@ -72,14 +72,19 @@ const Inventory = () => {
       <div className="p-4 w-full flex items-center justify-center bg-secondary-background">
         <div className="flex flex-col gap-4 w-5xl bg-background">
           <div className="flex flex-col bg-background p-4 border rounded-xl">
-            <div>
-              {" "}
-              <h1 className="text-xl">Products</h1>
-              <p className="text-muted-foreground text-sm">
-                {products.length} products in inventory
-              </p>
+            <div className="flex justify-between">
+              <div>
+                <h1 className="text-xl">Products</h1>
+                <p className="text-muted-foreground text-sm">
+                  {products.length} products in inventory
+                </p>
+              </div>
+              <Input
+                placeholder="Search..."
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-64"
+              />
             </div>
-            <Input placeholder="Search..." onChange={(e) => setSearch(e.target.value)} className="m-4 w-1/3" />
             <div className="mt-4">
               <DataTable
                 columns={columns}
