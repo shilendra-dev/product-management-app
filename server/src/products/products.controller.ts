@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -11,7 +12,6 @@ import {
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { CursorPipe } from './pipes/cursor.pipe';
 
 @Controller('products')
 export class ProductsController {
@@ -32,12 +32,10 @@ export class ProductsController {
 
   @Get()
   getAllProducts(
-    @Query('cursor', CursorPipe) cursor: string | null,
-    @Query('limit') limit: number,
+    @Query('limit', ParseIntPipe) limit: number,
+    @Query('offset', ParseIntPipe) offset: number,
   ) {
-    limit = Number(limit) || 10;
-    console.log('Query Params:', { cursor, limit });
-    return this.productsService.getAllProducts(cursor, limit);
+    return this.productsService.getAllProducts(limit, offset);
   }
 
   @Get(':id')

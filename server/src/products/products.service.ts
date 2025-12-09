@@ -9,7 +9,8 @@ export class ProductsService {
 
   async createProduct(createProductDto: CreateProductDto) {
     const { title, quantity, totalPrice, totalDiscount } = createProductDto;
-    if (!title || !quantity || !totalPrice || !totalDiscount) {
+    console.log('Received create product request:', createProductDto);
+    if (!title || !quantity || !totalPrice || totalDiscount === undefined) {
       return 'Missing required fields';
     }
     try {
@@ -36,16 +37,15 @@ export class ProductsService {
     }
   }
 
-  async getAllProducts(cursor: string | null, limit: number) {
+  async getAllProducts(limit: number, offset: number) {
     try {
-      const allProducts = await this.productsQueryService.getAllProductsQuery(
-        cursor,
-        limit,
-      );
-      cursor = allProducts[allProducts.length - 1]?.id || null;
+      const { products, total } =
+        await this.productsQueryService.getAllProductsQuery(limit, offset);
       return {
-        products: allProducts,
-        nextCursor: cursor,
+        products: products,
+        limit: limit,
+        offset: offset,
+        totalProducts: total,
       };
     } catch (error) {
       console.error('Error getting all products:', error);

@@ -6,29 +6,34 @@ import { UpdateProductDto } from './dto/update-product.dto';
 @Injectable()
 export class ProductsQueryService {
   constructor(private prisma: PrismaService) {}
-  // Add query-related methods here in the future
+
   async createProductQuery(createProductDto: CreateProductDto) {
+    console.log('Creating product with data:', createProductDto);
     const product = await this.prisma.product.create({
       data: createProductDto,
     });
     return product;
   }
 
-  async getAllProductsQuery(cursor: string | null, limit: number) {
-    //exclude deleted products
+  async getAllProductsQuery(limit: number, offset: number) {
     const products = await this.prisma.product.findMany({
       where: {
         deletedAt: null,
       },
-      take: limit,
-      skip: cursor ? 1 : 0, // Skip the cursor item itself
-      ...(cursor && { cursor: { id: cursor } }), // Set the cursor if provided
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
+      },
+      skip: offset,
+      take: limit,
+    });
+
+    const total = await this.prisma.product.count({
+      where: {
+        deletedAt: null,
       },
     });
 
-    return products;
+    return { products, total };
   }
 
   async getProductByIdQuery(id: string) {

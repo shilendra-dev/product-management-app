@@ -2,30 +2,46 @@ import Header from "@components/organisms/Header";
 import { useEffect, useState } from "react";
 import { DataTable } from "@/components/templates/DataTable";
 import { columns } from "@/components/organisms/Columns";
-import { getProducts } from "@/services/productApi";
 import type { Product } from "@/types/product";
 import { UpdateProductDialog } from "@/components/organisms/UpdateProductDialog";
 import Modal from "@/components/templates/Modal";
+import { getProducts } from "@/services/productApi";
 
 const Inventory = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
-  const [cursor, setCursor] = useState<string | null>(null);
-  const [limit] = useState<number>(10);
+  const [rowCount, setRowCount] = useState<number>(0);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const results = await getProducts(cursor, limit);
-      setProducts(results.products as Product[]);
-      setCursor(results.nextCursor);
+      setIsLoading(true);
+      try {
+        const response = await getProducts(
+          pagination.pageSize,
+          pagination.pageIndex * pagination.pageSize
+        );
+        setProducts(response.products);
+        setRowCount(response.totalProducts);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchProducts();
-  }, []);
+  }, [pagination.pageIndex, pagination.pageSize]);
 
   const onCreateProduct = (newProduct: Product) => {
-    setProducts([...products, newProduct]);
+    setProducts((prev) => [newProduct, ...prev]);
+    setRowCount((prevCount) => prevCount + 1);
   };
 
   const onUpdateProduct = (updatedProduct: Product) => {
@@ -61,6 +77,11 @@ const Inventory = () => {
               <DataTable
                 columns={columns}
                 data={products}
+                rowCount={rowCount}
+                isLoading={isLoading}
+                onPaginationChange={setPagination}
+                currentPageIndex={pagination.pageIndex}
+                currentPageSize={pagination.pageSize}
                 setSelectedProduct={(product) => {
                   setSelectedProduct(product);
                   setIsUpdateDialogOpen(true);

@@ -40,6 +40,7 @@ export function CreateProductDialog(props: {
       setError(null);
       if(!formData.title || !formData.totalPrice || !formData.quantity){
         setError("Title, Price, and Quantity are required fields.");
+        console.error("Title, Price, and Quantity are required fields.");
         setLoading(false);
         return;
       }
@@ -53,6 +54,7 @@ export function CreateProductDialog(props: {
         setLoading(false);
         return;
       }
+      console.log("Creating product with data:", formData);
       const newProduct = await createProduct(formData);
       props.onCreateProduct(newProduct);
       if (dialogCloseRef.current) {
@@ -72,7 +74,6 @@ export function CreateProductDialog(props: {
       [e.target.name]:
         e.target.type === "number" ? Number(e.target.value) : e.target.value,
     });
-    console.log(formData);
   };
   return (
     <Dialog>
