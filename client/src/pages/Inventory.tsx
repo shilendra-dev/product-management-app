@@ -5,17 +5,20 @@ import { columns } from "@/components/organisms/Columns";
 import { getProducts } from "@/services/productApi";
 import type { Product } from "@/types/product";
 import { UpdateProductDialog } from "@/components/organisms/UpdateProductDialog";
-import Modal from "@/components/templates/modal";
+import Modal from "@/components/templates/Modal";
 
 const Inventory = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [limit] = useState<number>(10);
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const productList = await getProducts();
-      setProducts(productList);
+      const results = await getProducts(cursor, limit);
+      setProducts(results.products as Product[]);
+      setCursor(results.nextCursor);
     };
 
     fetchProducts();
@@ -37,7 +40,7 @@ const Inventory = () => {
     setProducts((prevProducts) =>
       prevProducts.filter((product) => product.id !== deletedProductId)
     );
-  }
+  };
 
   return (
     <div className="bg-secondary-background w-full h-screen flex flex-col">

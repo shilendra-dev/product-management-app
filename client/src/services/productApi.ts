@@ -13,9 +13,9 @@ export const createProduct = async (
   }
 };
 
-export const getProducts = async (): Promise<Product[]> => {
+export const getProducts = async (cursor: string | null, limit: number): Promise<{ products: Product[], nextCursor: string | null }> => {
   try {
-    const response = await api.get<Product[]>("/products");
+    const response = await api.get<{ products: Product[], nextCursor: string | null }>(`/products?cursor=${cursor}&limit=${limit}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching products:", error);

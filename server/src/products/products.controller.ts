@@ -6,10 +6,12 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { CursorPipe } from './pipes/cursor.pipe';
 
 @Controller('products')
 export class ProductsController {
@@ -29,8 +31,13 @@ export class ProductsController {
   }
 
   @Get()
-  getAllProducts() {
-    return this.productsService.getAllProducts();
+  getAllProducts(
+    @Query('cursor', CursorPipe) cursor: string | null,
+    @Query('limit') limit: number,
+  ) {
+    limit = Number(limit) || 10;
+    console.log('Query Params:', { cursor, limit });
+    return this.productsService.getAllProducts(cursor, limit);
   }
 
   @Get(':id')

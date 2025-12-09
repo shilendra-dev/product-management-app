@@ -36,10 +36,17 @@ export class ProductsService {
     }
   }
 
-  async getAllProducts() {
+  async getAllProducts(cursor: string | null, limit: number) {
     try {
-      const allProducts = await this.productsQueryService.getAllProductsQuery();
-      return allProducts;
+      const allProducts = await this.productsQueryService.getAllProductsQuery(
+        cursor,
+        limit,
+      );
+      cursor = allProducts[allProducts.length - 1]?.id || null;
+      return {
+        products: allProducts,
+        nextCursor: cursor,
+      };
     } catch (error) {
       console.error('Error getting all products:', error);
       return 'Error getting all products';

@@ -14,11 +14,20 @@ export class ProductsQueryService {
     return product;
   }
 
-  async getAllProductsQuery() {
+  async getAllProductsQuery(cursor: string | null, limit: number) {
     //exclude deleted products
     const products = await this.prisma.product.findMany({
-      where: { deletedAt: null },
+      where: {
+        deletedAt: null,
+      },
+      take: limit,
+      skip: cursor ? 1 : 0, // Skip the cursor item itself
+      ...(cursor && { cursor: { id: cursor } }), // Set the cursor if provided
+      orderBy: {
+        createdAt: 'asc',
+      },
     });
+
     return products;
   }
 
