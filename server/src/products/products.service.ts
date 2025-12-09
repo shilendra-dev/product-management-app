@@ -37,14 +37,19 @@ export class ProductsService {
     }
   }
 
-  async getAllProducts(limit: number, offset: number) {
+  async getAllProducts(limit: number, offset: number, search?: string) {
     try {
       const { products, total } =
-        await this.productsQueryService.getAllProductsQuery(limit, offset);
+        await this.productsQueryService.getAllProductsQuery(
+          limit,
+          offset,
+          search,
+        );
       return {
         products: products,
         limit: limit,
         offset: offset,
+        search: search,
         totalProducts: total,
       };
     } catch (error) {

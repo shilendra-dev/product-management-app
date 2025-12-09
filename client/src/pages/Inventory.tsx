@@ -6,12 +6,14 @@ import type { Product } from "@/types/product";
 import { UpdateProductDialog } from "@/components/organisms/UpdateProductDialog";
 import Modal from "@/components/templates/Modal";
 import { getProducts } from "@/services/productApi";
+import { Input } from "@/components/ui/input";
 
 const Inventory = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [rowCount, setRowCount] = useState<number>(0);
+  const [search, setSearch] = useState<string>("");
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pagination, setPagination] = useState({
@@ -25,7 +27,8 @@ const Inventory = () => {
       try {
         const response = await getProducts(
           pagination.pageSize,
-          pagination.pageIndex * pagination.pageSize
+          pagination.pageIndex * pagination.pageSize,
+          search
         );
         setProducts(response.products);
         setRowCount(response.totalProducts);
@@ -37,7 +40,7 @@ const Inventory = () => {
     };
 
     fetchProducts();
-  }, [pagination.pageIndex, pagination.pageSize]);
+  }, [pagination.pageIndex, pagination.pageSize, search]);
 
   const onCreateProduct = (newProduct: Product) => {
     setProducts((prev) => [newProduct, ...prev]);
@@ -69,10 +72,14 @@ const Inventory = () => {
       <div className="p-4 w-full flex items-center justify-center bg-secondary-background">
         <div className="flex flex-col gap-4 w-5xl bg-background">
           <div className="flex flex-col bg-background p-4 border rounded-xl">
-            <h1 className="text-xl">Products</h1>
-            <p className="text-muted-foreground text-sm">
-              {products.length} products in inventory
-            </p>
+            <div>
+              {" "}
+              <h1 className="text-xl">Products</h1>
+              <p className="text-muted-foreground text-sm">
+                {products.length} products in inventory
+              </p>
+            </div>
+            <Input placeholder="Search..." onChange={(e) => setSearch(e.target.value)} className="m-4 w-1/3" />
             <div className="mt-4">
               <DataTable
                 columns={columns}

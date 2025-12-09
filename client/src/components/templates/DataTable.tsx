@@ -53,7 +53,7 @@ export function DataTable<TData, TValue>({
     },
     onPaginationChange: onPaginationChange,
   });
-  
+
   if (isLoading) return <div>Loading...</div>;
   return (
     <div>

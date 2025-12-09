@@ -15,12 +15,14 @@ export const createProduct = async (
 
 export const getProducts = async (
   limit: number,
-  offset: number
+  offset: number,
+  search?: string
 ): Promise<{
   products: Product[];
   totalProducts: number;
   limit: number;
   offset: number;
+  search?: string;
 }> => {
   try {
     const response = await api.get<{
@@ -28,7 +30,8 @@ export const getProducts = async (
       totalProducts: number;
       limit: number;
       offset: number;
-    }>(`/products?offset=${offset}&limit=${limit}`);
+      search?: string;
+    }>(`/products?offset=${offset}&limit=${limit}&search=${search || ""}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching products:", error);

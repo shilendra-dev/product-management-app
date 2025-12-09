@@ -34,8 +34,9 @@ export class ProductsController {
   getAllProducts(
     @Query('limit', ParseIntPipe) limit: number,
     @Query('offset', ParseIntPipe) offset: number,
+    @Query('search') search?: string,
   ) {
-    return this.productsService.getAllProducts(limit, offset);
+    return this.productsService.getAllProducts(limit, offset, search);
   }
 
   @Get(':id')

@@ -15,10 +15,24 @@ export class ProductsQueryService {
     return product;
   }
 
-  async getAllProductsQuery(limit: number, offset: number) {
+  async getAllProductsQuery(limit: number, offset: number, search?: string) {
     const products = await this.prisma.product.findMany({
       where: {
         deletedAt: null,
+        OR: [
+          {
+            title: {
+              contains: search || '',
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search || '',
+              mode: 'insensitive',
+            },
+          },
+        ],
       },
       orderBy: {
         createdAt: 'desc',
