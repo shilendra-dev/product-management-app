@@ -1,12 +1,13 @@
 import Header from "@components/organisms/Header";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DataTable } from "@/components/templates/DataTable";
 import { columns } from "@/components/organisms/Columns";
 import type { Product } from "@/types/product";
 import { UpdateProductDialog } from "@/components/organisms/UpdateProductDialog";
 import Modal from "@/components/templates/Modal";
-import { getProducts } from "@/services/productApi";
 import { Input } from "@/components/ui/input";
+import { useProducts } from "@/hooks/queries/useProducts";
+import { useCreateProduct } from "@/hooks/mutations/useCreateProduct";
 
 const Inventory = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -15,36 +16,22 @@ const Inventory = () => {
   const [rowCount, setRowCount] = useState<number>(0);
   const [search, setSearch] = useState<string>("");
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  // const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getProducts(
-          pagination.pageSize,
-          pagination.pageIndex * pagination.pageSize,
-          search
-        );
-        setProducts(response.products);
-        setRowCount(response.totalProducts);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const { data, isLoading, error, refetch } = useProducts({
+    limit: pagination.pageSize,
+    offset: pagination.pageIndex * pagination.pageSize,
+    search,
+  });
 
-    fetchProducts();
-  }, [pagination.pageIndex, pagination.pageSize, search]);
+  const {mutate: createProduct} = useCreateProduct();
 
   const onCreateProduct = (newProduct: Product) => {
-    setProducts((prev) => [newProduct, ...prev]);
-    setRowCount((prevCount) => prevCount + 1);
+    createProduct(newProduct);
   };
 
   const onUpdateProduct = (updatedProduct: Product) => {
@@ -88,7 +75,7 @@ const Inventory = () => {
             <div className="mt-4">
               <DataTable
                 columns={columns}
-                data={products}
+                data={data ? data.products : []}
                 rowCount={rowCount}
                 isLoading={isLoading}
                 onPaginationChange={setPagination}
