@@ -13,7 +13,6 @@ const Inventory = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
-  const [rowCount, setRowCount] = useState<number>(0);
   const [search, setSearch] = useState<string>("");
 
   // const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -76,7 +75,7 @@ const Inventory = () => {
               <DataTable
                 columns={columns}
                 data={data ? data.products : []}
-                rowCount={rowCount}
+                rowCount={data ? data.totalProducts : 0}
                 isLoading={isLoading}
                 onPaginationChange={setPagination}
                 currentPageIndex={pagination.pageIndex}

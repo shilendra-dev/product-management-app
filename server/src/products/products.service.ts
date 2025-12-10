@@ -9,9 +9,14 @@ export class ProductsService {
 
   async createProduct(createProductDto: CreateProductDto) {
     const { title, quantity, totalPrice, totalDiscount } = createProductDto;
-    console.log('Received create product request:', createProductDto);
-    if (!title || !quantity || !totalPrice || totalDiscount === undefined) {
-      return 'Missing required fields';
+    if (
+      !title ||
+      title.trim().length === 0 ||
+      !quantity ||
+      !totalPrice ||
+      totalDiscount === undefined
+    ) {
+      throw new Error('Missing required product fields');
     }
     try {
       const result =
@@ -33,7 +38,7 @@ export class ProductsService {
       return result;
     } catch (error) {
       console.error('Error updating product:', error);
-      return 'Error updating product';
+      throw new Error('Error updating product');
     }
   }
 
@@ -54,7 +59,7 @@ export class ProductsService {
       };
     } catch (error) {
       console.error('Error getting all products:', error);
-      return 'Error getting all products';
+      throw new Error('Error getting all products');
     }
   }
 
@@ -64,7 +69,7 @@ export class ProductsService {
       return product;
     } catch (error) {
       console.error('Error getting product by id:', error);
-      return 'Error getting product by id';
+      throw new Error('Error getting product by id');
     }
   }
 
@@ -77,7 +82,7 @@ export class ProductsService {
       return deletedProduct;
     } catch (error) {
       console.error('Error soft deleting product:', error);
-      return 'Error soft deleting product';
+      throw new Error('Error soft deleting product');
     }
   }
 
@@ -90,7 +95,7 @@ export class ProductsService {
       return restoredProduct;
     } catch (error) {
       console.error('Error restoring product:', error);
-      return 'Error restoring product';
+      throw new Error('Error restoring product');
     }
   }
 }
