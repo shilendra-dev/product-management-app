@@ -21,7 +21,7 @@ const Inventory = () => {
     pageSize: 10,
   });
 
-  const { data, isLoading, error, refetch } = useProducts({
+  const { data, isLoading } = useProducts({
     limit: pagination.pageSize,
     offset: pagination.pageIndex * pagination.pageSize,
     search,
@@ -62,7 +62,7 @@ const Inventory = () => {
               <div>
                 <h1 className="text-xl">Products</h1>
                 <p className="text-muted-foreground text-sm">
-                  {products.length} products in inventory
+                  {data ? data.totalProducts : 0} products in inventory
                 </p>
               </div>
               <Input
