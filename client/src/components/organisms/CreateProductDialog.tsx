@@ -13,7 +13,6 @@ import { Input } from "@/components/atoms/Input";
 import { Label } from "@/components/atoms/Label";
 import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
-import { createProduct } from "@/services/productApi";
 import type { Product } from "@/types/product";
 
 export function CreateProductDialog(props: {
@@ -54,9 +53,8 @@ export function CreateProductDialog(props: {
         setLoading(false);
         return;
       }
-      console.log("Creating product with data:", formData);
-      const newProduct = await createProduct(formData);
-      props.onCreateProduct(newProduct);
+
+      props.onCreateProduct(formData as Product);
       if (dialogCloseRef.current) {
         dialogCloseRef.current.click();
       }

@@ -30,6 +30,7 @@ const Inventory = () => {
   const {mutate: createProduct} = useCreateProduct();
 
   const onCreateProduct = (newProduct: Product) => {
+    console.log("Creating product from Inventory page:", newProduct);
     createProduct(newProduct);
   };
 
