@@ -34,9 +34,23 @@ export const useCreateProduct = () => {
       if (context?.previousProducts) {
         queryClient.setQueryData(["products"], context.previousProducts);
       }
+      console.error("Error creating product:", newProduct, err);
     },
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
+    onSuccess: (data) => {
+        //replacing the temp product with the one from server
+        queryClient.setQueryData(["products"], (old: { products: Product[] }) => ({
+          ...old,
+          products: old.products.filter((product) => product.id !== "temp-id"),
+        }));
+
+        //added the product from api response
+        queryClient.setQueryData(["products"], (old: { products: Product[] }) => ({
+          ...old,
+          products: [...old.products, data],
+        }));
+    }
   });
 };
