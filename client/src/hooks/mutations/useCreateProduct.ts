@@ -14,18 +14,15 @@ export const useCreateProduct = () => {
     onMutate: async (newProduct) => {
       await queryClient.cancelQueries({ queryKey: ["products"] });
 
-      console.log(
-  queryClient.getQueryCache().getAll().map(q => q.queryKey)
-);
       const previousProducts = await queryClient.getQueryData([
         "products",
-        { limit: 10, offset: 0, search: '' },
+        { limit: 10, offset: 0, search: "" },
       ]);
 
       console.log(previousProducts);
 
       queryClient.setQueryData(
-        ["products", { limit: 10, offset: 0, search: '' }],
+        ["products", { limit: 10, offset: 0, search: "" }],
         (old: { products: Product[] } | undefined) => {
           if (!old) return old;
           return {
@@ -41,13 +38,13 @@ export const useCreateProduct = () => {
           };
         }
       );
-      console.log("onMutate called with newProduct:", newProduct);
+
       return { previousProducts };
     },
     onError: (err, newProduct, context) => {
       if (context?.previousProducts) {
         queryClient.setQueryData(
-          ["products", { limit: 10, offset: 0, search: '' }],
+          ["products", { limit: 10, offset: 0, search: "" }],
           context.previousProducts
         );
       }
@@ -59,7 +56,7 @@ export const useCreateProduct = () => {
     onSuccess: (data) => {
       //replacing the temp product with the one from server
       queryClient.setQueryData(
-        ["products", { limit: 10, offset: 0, search: '' }],
+        ["products", { limit: 10, offset: 0, search: "" }],
         (old: { products: Product[] } | undefined) => {
           if (!old) return old;
           return {
@@ -73,7 +70,7 @@ export const useCreateProduct = () => {
 
       //added the product from api response
       queryClient.setQueryData(
-        ["products", { limit: 10, offset: 0, search: '' }],
+        ["products", { limit: 10, offset: 0, search: "" }],
         (old: { products: Product[] } | undefined) => {
           if (!old) return old;
           return {
