@@ -9,9 +9,9 @@ import { Input } from "@/components/ui/input";
 import { useProducts } from "@/hooks/queries/useProducts";
 import { useCreateProduct } from "@/hooks/mutations/useCreateProduct";
 import { useUpdateProduct } from "@/hooks/mutations/useUpdateProduct";
+import { useDeleteProduct } from "@/hooks/mutations/useDeleteProduct";
 
 const Inventory = () => {
-  const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [search, setSearch] = useState<string>("");
@@ -30,6 +30,7 @@ const Inventory = () => {
 
   const {mutate: createProduct} = useCreateProduct();
   const {mutate: updateProduct} = useUpdateProduct();
+  const {mutate: deleteProduct} = useDeleteProduct();
 
   const onCreateProduct = (newProduct: Product) => {
     createProduct(newProduct);
@@ -40,9 +41,7 @@ const Inventory = () => {
   };
 
   const onDeleteProduct = (deletedProductId: string) => {
-    setProducts((prevProducts) =>
-      prevProducts.filter((product) => product.id !== deletedProductId)
-    );
+    deleteProduct(deletedProductId);
   };
 
   return (

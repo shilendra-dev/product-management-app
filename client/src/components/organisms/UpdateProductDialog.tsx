@@ -11,7 +11,6 @@ import { Label } from "../atoms/Label";
 import { Input } from "../atoms/Input";
 import Button from "../atoms/Button";
 import { useState } from "react";
-import { deleteProduct } from "@/services/productApi";
 
 export function UpdateProductDialog({
   product,
@@ -91,8 +90,7 @@ export function UpdateProductDialog({
       setLoading(true);
       setError(null);
       if (!product) throw new Error("Product not found");
-      const deletedProduct = await deleteProduct(product.id);
-      onDeleteProduct(deletedProduct.id);
+      onDeleteProduct(product.id);
       setLoading(false);
       setIsUpdateDialogOpen(false);
     } catch (error) {
