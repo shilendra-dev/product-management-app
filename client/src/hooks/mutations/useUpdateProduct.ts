@@ -20,6 +20,37 @@ export const useUpdateProduct = () => {
 
     onMutate: async (updatedProduct) => {
       await queryClient.cancelQueries({ queryKey: ["products"] });
+
+      const previousProducts = await queryClient.getQueryData(["products"]);
+
+      queryClient.setQueryData(
+        ["products"],
+        (old: { products: Product[] } | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            products: old.products.map((product) =>
+              product.id === updatedProduct.productId
+                ? { ...product, ...updatedProduct.productData }
+                : product
+            ),
+          };
+        }
+      );
+
+      return { previousProducts };
+    },
+    onError: (err, updatedProduct, context) => {
+      if (context?.previousProducts) {
+        queryClient.setQueryData(["products"], context.previousProducts);
+      }
+      console.error("Error updating product:", updatedProduct, err);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+    onSuccess: () => {
+      console.log("Product updated successfully");
     },
   });
 };

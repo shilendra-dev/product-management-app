@@ -45,6 +45,7 @@ export const updateProduct = async (
   productId: string
 ): Promise<Product> => {
   try {
+    console.log("Updating product with ID:", productId, "and data:", productData);
     const response = await api.put<Product>(
       `/products/${productId}`,
       productData

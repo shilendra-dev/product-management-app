@@ -8,6 +8,7 @@ import Modal from "@/components/templates/Modal";
 import { Input } from "@/components/ui/input";
 import { useProducts } from "@/hooks/queries/useProducts";
 import { useCreateProduct } from "@/hooks/mutations/useCreateProduct";
+import { useUpdateProduct } from "@/hooks/mutations/useUpdateProduct";
 
 const Inventory = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -28,18 +29,14 @@ const Inventory = () => {
   });
 
   const {mutate: createProduct} = useCreateProduct();
+  const {mutate: updateProduct} = useUpdateProduct();
 
   const onCreateProduct = (newProduct: Product) => {
-    console.log("Creating product from Inventory page:", newProduct);
     createProduct(newProduct);
   };
 
-  const onUpdateProduct = (updatedProduct: Product) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === updatedProduct.id ? updatedProduct : product
-      )
-    );
+  const onUpdateProduct = (updatedProduct: Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">, productId: string) => {
+    updateProduct({ productData: updatedProduct, productId: productId });
   };
 
   const onDeleteProduct = (deletedProductId: string) => {

@@ -23,7 +23,7 @@ export function UpdateProductDialog({
   product: Product | null;
   isUpdateDialogOpen: boolean;
   setIsUpdateDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onUpdateProduct: (updatedProduct: Product) => void;
+  onUpdateProduct: (updatedProduct: Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">, productId: string) => void;
   onDeleteProduct: (deletedProductId: string) => void;
 }) {
   const [loading, setLoading] = useState(false);
@@ -79,7 +79,7 @@ export function UpdateProductDialog({
       if (!product) throw new Error("Product not found");
       const updatedProduct = await updateProduct(formData, product.id);
       console.log("Updated Product:", updatedProduct);
-      onUpdateProduct(updatedProduct);
+      onUpdateProduct(formData, product.id);
       setLoading(false);
       setIsUpdateDialogOpen(false);
     } catch (error) {
