@@ -11,6 +11,23 @@ import { Label } from "../atoms/Label";
 import { Input } from "../atoms/Input";
 import Button from "../atoms/Button";
 import { useState } from "react";
+import z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const updateProductSchema = z
+  .object({
+    title: z.string().min(1, "Title is required"),
+    description: z.string().optional(),
+    totalPrice: z.number().min(0, "Price cannot be negative"),
+    quantity: z.number().min(0, "Quantity cannot be negative"),
+    totalDiscount: z.number().min(0, "Discount cannot be negative"),
+  })
+  .refine((data) => data.totalDiscount <= data.totalPrice, {
+    message: "Total Discount cannot exceed Total Price",
+  });
+
+type updateProductInput = z.infer<typeof updateProductSchema>;
 
 export function UpdateProductDialog({
   product,
@@ -22,61 +39,39 @@ export function UpdateProductDialog({
   product: Product | null;
   isUpdateDialogOpen: boolean;
   setIsUpdateDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onUpdateProduct: (updatedProduct: Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">, productId: string) => void;
+  onUpdateProduct: (
+    updatedProduct: Omit<
+      Product,
+      "id" | "createdAt" | "updatedAt" | "deletedAt"
+    >,
+    productId: string
+  ) => void;
   onDeleteProduct: (deletedProductId: string) => void;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState<
-    Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">
-  >({
-    title: product?.title || "",
-    description: product?.description || "",
-    totalPrice: product?.totalPrice || 0,
-    quantity: product?.quantity || 0,
-    totalDiscount: product?.totalDiscount || 0,
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<updateProductInput>({
+    defaultValues: {
+      title: product?.title || "",
+      description: product?.description || "",
+      totalPrice: product?.totalPrice || 0,
+      quantity: product?.quantity || 0,
+      totalDiscount: product?.totalDiscount || 0,
+    },
+    resolver: zodResolver(updateProductSchema),
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        name === "title" || name === "description" ? value : Number(value),
-    }));
-  };
-
-  const submitHandler = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    setLoading(true);
-    setError(null);
-
-    //Validations
-    if (!formData.title || !formData.totalPrice || !formData.quantity) {
-      setError("Title, Price, and Quantity are required fields.");
-      setLoading(false);
-      return;
-    }
-    if (
-      formData.totalPrice < 0 ||
-      formData.quantity < 0 ||
-      formData.totalDiscount < 0
-    ) {
-      setError("Price, Quantity, and Discount cannot be negative.");
-      setLoading(false);
-      return;
-    }
-    if (formData.totalDiscount > formData.totalPrice) {
-      setError("Total Discount cannot exceed Total Price.");
-      setLoading(false);
-      return;
-    }
-
+  const onSubmit = (data: updateProductInput) => {
     try {
+      setLoading(true);
+      setError(null);
       if (!product) throw new Error("Product not found");
-      onUpdateProduct(formData, product.id);
+      onUpdateProduct(data, product.id);
       setLoading(false);
       setIsUpdateDialogOpen(false);
     } catch (error) {
@@ -84,7 +79,6 @@ export function UpdateProductDialog({
       setLoading(false);
     }
   };
-
   const handleDelete = async () => {
     try {
       setLoading(true);
@@ -101,7 +95,7 @@ export function UpdateProductDialog({
 
   return (
     <Dialog open={isUpdateDialogOpen} onOpenChange={setIsUpdateDialogOpen}>
-      <form>
+      <form id="update-product-form" onSubmit={handleSubmit(onSubmit)}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Product Details</DialogTitle>
@@ -114,19 +108,29 @@ export function UpdateProductDialog({
               <Label>Title</Label>
               <Input
                 placeholder="Product title"
-                onChange={handleChange}
-                name="title"
-                value={formData.title}
+                {...register("title", {
+                  required: true,
+                  minLength: 1,
+                  maxLength: 100,
+                })}
               />
+              {errors.title && (
+                <p className="text-destructive/70 text-xs">
+                  {errors.title.message}
+                </p>
+              )}
             </div>
             <div className="flex flex-col gap-3">
               <Label>Description</Label>
               <Input
                 placeholder="Product description..."
-                onChange={handleChange}
-                name="description"
-                value={formData.description}
+                {...register("description", { maxLength: 500 })}
               />
+              {errors.description && (
+                <p className="text-destructive/70 text-xs">
+                  {errors.description.message}
+                </p>
+              )}
             </div>
             <div className="flex justify-between">
               <div className="flex flex-col gap-3">
@@ -134,31 +138,52 @@ export function UpdateProductDialog({
                 <Input
                   type="number"
                   placeholder="0.00"
-                  onChange={handleChange}
-                  name="totalPrice"
-                  value={formData.totalPrice}
+                  {...register("totalPrice", {
+                    required: true,
+                    min: 0,
+                    valueAsNumber: true,
+                  })}
                 />
+                {errors.totalPrice && (
+                  <p className="text-destructive/70 text-xs">
+                    {errors.totalPrice.message}
+                  </p>
+                )}
               </div>
               <div className="flex flex-col gap-3">
                 <Label>Quantity</Label>
                 <Input
                   type="number"
                   placeholder="0"
-                  name="quantity"
-                  onChange={handleChange}
-                  value={formData.quantity}
+                  {...register("quantity", {
+                    required: true,
+                    min: 0,
+                    valueAsNumber: true,
+                  })}
                 />
+                {errors.quantity && (
+                  <p className="text-destructive/70 text-xs">
+                    {errors.quantity.message}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex flex-col gap-3">
               <Label>Total Discount</Label>
               <Input
                 type="number"
-                onChange={handleChange}
                 placeholder="0"
-                name="totalDiscount"
-                value={formData.totalDiscount}
+                {...register("totalDiscount", {
+                  required: true,
+                  min: 0,
+                  valueAsNumber: true,
+                })}
               />
+              {errors.totalDiscount && (
+                <p className="text-destructive/70 text-xs">
+                  {errors.totalDiscount.message}
+                </p>
+              )}
             </div>
             <div className="flex">
               <div className="flex flex-col gap-1">
@@ -184,7 +209,11 @@ export function UpdateProductDialog({
             >
               Delete
             </Button>
-            <Button type="submit" disabled={loading} onClick={submitHandler}>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              form="update-product-form"
+            >
               Update
             </Button>
           </DialogFooter>
