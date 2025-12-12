@@ -8,60 +8,79 @@ export class ProductsQueryService {
   constructor(private prisma: PrismaService) {}
 
   async createProductQuery(createProductDto: CreateProductDto) {
-    console.log('Creating product with data:', createProductDto);
-    const product = await this.prisma.product.create({
-      data: createProductDto,
-    });
-    return product;
+    try {
+      const product = await this.prisma.product.create({
+        data: createProductDto,
+      });
+      return product;
+    } catch (error) {
+      console.error('Error in createProductQuery:', error);
+      throw error;
+    }
   }
 
   async getAllProductsQuery(limit: number, offset: number, search?: string) {
-    const products = await this.prisma.product.findMany({
-      where: {
-        deletedAt: null,
-        OR: [
-          {
-            title: {
-              contains: search || '',
-              mode: 'insensitive',
+    try {
+      const products = await this.prisma.product.findMany({
+        where: {
+          deletedAt: null,
+          OR: [
+            {
+              title: {
+                contains: search || '',
+                mode: 'insensitive',
+              },
             },
-          },
-          {
-            description: {
-              contains: search || '',
-              mode: 'insensitive',
+            {
+              description: {
+                contains: search || '',
+                mode: 'insensitive',
+              },
             },
-          },
-        ],
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      skip: offset,
-      take: limit,
-    });
+          ],
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip: offset,
+        take: limit,
+      });
 
-    const total = await this.prisma.product.count({
-      where: {
-        deletedAt: null,
-      },
-    });
+      const total = await this.prisma.product.count({
+        where: {
+          deletedAt: null,
+        },
+      });
 
-    return { products, total };
+      return { products, total };
+    } catch (error) {
+      console.error('Error in getAllProductsQuery:', error);
+      throw error;
+    }
   }
 
   async getProductByIdQuery(id: string) {
-    const product = await this.prisma.product.findUnique({
-      where: { id },
-    });
-    return product;
+    try {
+      const product = await this.prisma.product.findUnique({
+        where: { id },
+      });
+      return product;
+    } catch (error) {
+      console.error('Error in getProductByIdQuery:', error);
+      throw error;
+    }
   }
 
   async updateProductQuery(id: string, updateProductDto: UpdateProductDto) {
-    const updatedProduct = await this.prisma.product.update({
-      where: { id },
-      data: updateProductDto,
-    });
-    return updatedProduct;
+    try {
+      const updatedProduct = await this.prisma.product.update({
+        where: { id },
+        data: updateProductDto,
+      });
+      return updatedProduct;
+    } catch (error) {
+      console.error('Error in updateProductQuery:', error);
+      throw error;
+    }
   }
 }

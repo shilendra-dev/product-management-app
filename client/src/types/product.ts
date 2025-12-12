@@ -9,3 +9,11 @@ export interface Product {
   updatedAt: string;
   deletedAt?: string;
 }
+
+export interface ProductCreateInput {
+  title: string;
+  description?: string;
+  quantity: number;
+  totalPrice: number;
+  totalDiscount: number;
+}

@@ -1,5 +1,6 @@
 import api from "@/lib/axios";
 import type { Product } from "@/types/product";
+import type { ProductParams } from "@/types/api";
 
 export const createProduct = async (
   productData: Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">
@@ -13,11 +14,11 @@ export const createProduct = async (
   }
 };
 
-export const getProducts = async (
-  limit: number,
-  offset: number,
-  search?: string
-): Promise<{
+export const getProducts = async ({
+  limit,
+  offset,
+  search,
+}: ProductParams): Promise<{
   products: Product[];
   totalProducts: number;
   limit: number;
@@ -44,6 +45,7 @@ export const updateProduct = async (
   productId: string
 ): Promise<Product> => {
   try {
+    console.log("Updating product with ID:", productId, "and data:", productData);
     const response = await api.put<Product>(
       `/products/${productId}`,
       productData
@@ -61,6 +63,16 @@ export const deleteProduct = async (productId: string): Promise<Product> => {
     return response.data;
   } catch (error) {
     console.error("Error deleting product:", error);
+    throw error;
+  }
+};
+
+export const getProductById = async (productId: string): Promise<Product> => {
+  try {
+    const response = await api.get<Product>(`/products/${productId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching product by ID:", error);
     throw error;
   }
 };

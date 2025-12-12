@@ -1,64 +1,47 @@
 import Header from "@components/organisms/Header";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DataTable } from "@/components/templates/DataTable";
 import { columns } from "@/components/organisms/Columns";
 import type { Product } from "@/types/product";
 import { UpdateProductDialog } from "@/components/organisms/UpdateProductDialog";
 import Modal from "@/components/templates/Modal";
-import { getProducts } from "@/services/productApi";
 import { Input } from "@/components/ui/input";
+import { useProducts } from "@/hooks/queries/useProducts";
+import { useCreateProduct } from "@/hooks/mutations/useCreateProduct";
+import { useUpdateProduct } from "@/hooks/mutations/useUpdateProduct";
+import { useDeleteProduct } from "@/hooks/mutations/useDeleteProduct";
 
 const Inventory = () => {
-  const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
-  const [rowCount, setRowCount] = useState<number>(0);
   const [search, setSearch] = useState<string>("");
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  // const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getProducts(
-          pagination.pageSize,
-          pagination.pageIndex * pagination.pageSize,
-          search
-        );
-        setProducts(response.products);
-        setRowCount(response.totalProducts);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const { data, isLoading } = useProducts({
+    limit: pagination.pageSize,
+    offset: pagination.pageIndex * pagination.pageSize,
+    search,
+  });
 
-    fetchProducts();
-  }, [pagination.pageIndex, pagination.pageSize, search]);
+  const {mutate: createProduct} = useCreateProduct();
+  const {mutate: updateProduct} = useUpdateProduct();
+  const {mutate: deleteProduct} = useDeleteProduct();
 
   const onCreateProduct = (newProduct: Product) => {
-    setProducts((prev) => [newProduct, ...prev]);
-    setRowCount((prevCount) => prevCount + 1);
+    createProduct(newProduct);
   };
 
-  const onUpdateProduct = (updatedProduct: Product) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === updatedProduct.id ? updatedProduct : product
-      )
-    );
+  const onUpdateProduct = (updatedProduct: Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">, productId: string) => {
+    updateProduct({ productData: updatedProduct, productId: productId });
   };
 
   const onDeleteProduct = (deletedProductId: string) => {
-    setProducts((prevProducts) =>
-      prevProducts.filter((product) => product.id !== deletedProductId)
-    );
+    deleteProduct(deletedProductId);
   };
 
   return (
@@ -76,7 +59,7 @@ const Inventory = () => {
               <div>
                 <h1 className="text-xl">Products</h1>
                 <p className="text-muted-foreground text-sm">
-                  {products.length} products in inventory
+                  {data ? data.totalProducts : 0} products in inventory
                 </p>
               </div>
               <Input
@@ -88,8 +71,8 @@ const Inventory = () => {
             <div className="mt-4">
               <DataTable
                 columns={columns}
-                data={products}
-                rowCount={rowCount}
+                data={data ? data.products : []}
+                rowCount={data ? data.totalProducts : 0}
                 isLoading={isLoading}
                 onPaginationChange={setPagination}
                 currentPageIndex={pagination.pageIndex}
